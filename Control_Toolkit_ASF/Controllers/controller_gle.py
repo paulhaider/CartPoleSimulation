@@ -14,8 +14,8 @@ from SI_Toolkit.computation_library import TensorType, PyTorchLibrary
 PATH_TO_MINIMALE_REPO = Path("/home/timo/phd/Projects/gle/minimaLE")
 PATH_TO_CARTPOLE_DIR = PATH_TO_MINIMALE_REPO / Path("experiments/cartpole")
 PATH_TO_MODELS = PATH_TO_CARTPOLE_DIR / "models"
-MODEL_PARAMS_FNAME = "params.json"
-MODEL_STATE_DICT_FNAME = "model_59.torch"
+MODEL_PARAMS_FNAME = PATH_TO_MODELS / "params.json"
+MODEL_STATE_DICT_FNAME = PATH_TO_MODELS / "model_59.torch"
 
 sys.path.append(str(PATH_TO_MINIMALE_REPO / PATH_TO_CARTPOLE_DIR))
 
@@ -48,7 +48,7 @@ class controller_gle(template_controller):
             prospective_errors=self.params["prospective_errors"],
         )
 
-        self.model.load_state_dict(MODEL_STATE_DICT_FNAME, weights_only=True)
+        self.model.load_state_dict(torch.load(MODEL_STATE_DICT_FNAME, weights_only=True))
         # TODO weights_only = True OR False???
         self.model.eval()
 
