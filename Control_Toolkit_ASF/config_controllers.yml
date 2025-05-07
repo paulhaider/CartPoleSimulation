@@ -95,8 +95,10 @@ mpc-opti:
   mpc_horizon: 10                       # steps
   controller_logging: True
 neural-imitator:
-  seed: null                            # If null, random seed based on datetime is used
-  PATH_TO_MODELS: './GymlikeCartPole/'
+#  seed: null                            # If null, random seed based on datetime is used
+#  PATH_TO_MODELS: './SI_Toolkit_ASF/Experiments/Experiment_16_11_2024_pole_L_and_m_informed/Models/'
+#  net_name: 'GRU-8IN-64H1-64H2-1OUT-2'  # TF
+  PATH_TO_MODELS: './SI_Toolkit_ASF/Experiments/Trial_14__17_08_2024_Agnes/Models/'
   net_name: 'Dense-7IN-32H1-32H2-1OUT-0'  # TF
 #  net_name: 'GRU-6IN-32H1-32H2-1OUT-0'  # Pytorch
   input_at_input: False
@@ -121,3 +123,6 @@ fpga:
   controller_logging: True
   SERIAL_PORT: 3
   SERIAL_BAUD: 230400
+gle:
+  computation_library: pytorch
+  controller_logging: False
