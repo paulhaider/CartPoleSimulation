@@ -58,9 +58,9 @@ class controller_gle(template_controller):
 
         # structure of s (hopefully...)
         # [angle, angleD, angle_cos, angle_sin, position, positionD]
-        s = torch.from_numpy(s)
+        s = torch.from_numpy(s).to(torch.float)
         s = s.view(1, -1)
 
         out = self.model(s, None, beta=0)
 
-        return out.item()
+        return out.to(torch.double).item()
