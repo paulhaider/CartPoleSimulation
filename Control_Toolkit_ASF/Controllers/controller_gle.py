@@ -11,11 +11,12 @@ import torch
 from Control_Toolkit.Controllers import template_controller
 from SI_Toolkit.computation_library import TensorType, PyTorchLibrary
 
-PATH_TO_MINIMALE_REPO = Path("/home/timo/phd/Projects/gle/minimaLE")
+PATH_TO_MINIMALE_REPO = Path("/home/paul/dev/minimaLE")
 PATH_TO_CARTPOLE_DIR = PATH_TO_MINIMALE_REPO / Path("experiments/cartpole")
 PATH_TO_MODELS = PATH_TO_CARTPOLE_DIR / "models"
-MODEL_PARAMS_FNAME = PATH_TO_MODELS / "params.json"
-MODEL_STATE_DICT_FNAME = PATH_TO_MODELS / "model_59.torch"
+# best so far
+MODEL_PARAMS_FNAME = "run_218.json"
+MODEL_STATE_DICT_FNAME = "run_218.torch"
 
 sys.path.append(str(PATH_TO_MINIMALE_REPO / PATH_TO_CARTPOLE_DIR))
 
@@ -30,26 +31,14 @@ class controller_gle(template_controller):
 
         # GLE network input:
         # ['angle', 'angleD', 'angle_cos', 'angle_sin', 'position', 'positionD']
-        with open(MODEL_PARAMS_FNAME, "r") as f:
+        with open(PATH_TO_MODELS / MODEL_PARAMS_FNAME, "r") as f:
             self.params = json.load(
                 f,
             )
 
-        self.model = Net(
-            tau_m=self.params["tau_m"],
-            tau_r=self.params["tau_r"],
-            dt=self.params["dt"],
-            n_inputs=len(self.params["input_vars"]),
-            n_hidden=self.params["n_hidden"],
-            n_outputs=len(self.params["output_vars"]),
-            params=self.params,
-            phi=get_phi_and_derivative(self.params["phi"])[0],
-            phi_prime=get_phi_and_derivative(self.params["phi"])[1],
-            prospective_errors=self.params["prospective_errors"],
-        )
+        self.model = Net(params=self.params)
 
-        self.model.load_state_dict(torch.load(MODEL_STATE_DICT_FNAME, weights_only=True))
-        # TODO weights_only = True OR False???
+        self.model.load_state_dict(torch.load(PATH_TO_MODELS / MODEL_STATE_DICT_FNAME))
         self.model.eval()
 
     def step(
@@ -58,9 +47,12 @@ class controller_gle(template_controller):
 
         # structure of s (hopefully...)
         # [angle, angleD, angle_cos, angle_sin, position, positionD]
+        # append state with target equilibrium and target position
+        s = np.append(s, [1, 0])
         s = torch.from_numpy(s).to(torch.float)
         s = s.view(1, -1)
 
-        out = self.model(s, None, beta=0)
+        for _ in range(9):
+            out = self.model(s, None, beta=0)
 
         return out.to(torch.double).item()
